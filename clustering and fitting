@@ -1,0 +1,235 @@
+
+
+import numpy as np
+import pandas as pd
+import matplotlib   # used to do the formatting
+import matplotlib.pyplot as plt
+import scipy.stats as stats  # good module for statistical operations
+import sklearn.cluster as cluster
+import sklearn.metrics as skmet
+import matplotlib.pyplot as plt
+import pandas as pd
+import scipy.optimize as opt
+import sklearn as sk
+from sklearn import linear_model
+#import errors as err
+#import map
+
+#  descibing function to Read files using pandas
+def Read_data(file_name, sep='delimiter', header=None):
+    df_1=pd.read_csv(file_name)
+    df_1=df_1.iloc[[13,17,21,24,26,32,33,36,41,43,44,49,57,59,62,64,76,79,81,85,87,93,110,113,115,117,116,120,121,122,123,124,125,
+                    130,132,134,142,152,155,158,162,164,173,178,180,182,184,186,188,190,191,194,198,209,212,227,237,248,252,255,261,267],
+                   [0,34,35,36,37,38,39,40,41,42,43,44,45,46,
+                    47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63]]
+    df_1.replace(0, np.nan, inplace=True)
+    df_1 = df_1.set_axis(['Country', '1990', '1991', '1992', '1993','1994','1995','1996','1997','1998','1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'],
+                         axis=1, inplace=False)
+    #df_1 = df_1.dropna()
+    return df_1
+
+def norm(array):
+    min_val = np.min(array)
+    max_val = np.max(array)
+    scaled = (array-min_val) / (max_val-min_val)
+    return scaled
+def norm_df(df, first=0, last=None):
+    for col in df.columns[first:last]: # excluding the first column
+        df[col] = norm(df[col])
+    return df
+
+df_CO2=Read_data("C:\\Users\\DELL\\Downloads\\CO2 $ GDP.csv")
+print(df_CO2)
+df_CO2_L=Read_data("C:\\Users\\DELL\\Downloads\\CO2 LIQUID.csv")
+print(df_CO2_L)
+print(df_CO2.describe())
+df_1 = df_CO2.iloc[0:6, 1:30]
+print(df_1)
+df_2=df_CO2.T
+print(df_2)
+print(df_CO2['1990'])
+print(df_CO2['2019'])
+
+df_fit = df_CO2[["1990", "2019"]].copy()
+df_fit = norm_df(df_fit)
+print(df_fit.describe())
+print()
+print(df_fit)
+
+
+
+for ic in range(2, 7):
+# set up kmeans and fit
+    kmeans = cluster.KMeans(n_clusters=ic)
+    kmeans.fit(df_fit)
+# extract labels and calculate silhoutte score
+    labels = kmeans.labels_
+    print (ic, skmet.silhouette_score(df_fit, labels))
+
+ # Plot for four clusters
+kmeans = cluster.KMeans(n_clusters=4)
+kmeans.fit(df_fit)
+# extract labels and cluster centres
+labels = kmeans.labels_
+cen = kmeans.cluster_centers_
+plt.figure(figsize=(6.0, 6.0))
+plt.scatter(df_fit["1990"], df_fit["2019"], c=labels, cmap="Accent")
+# colour map Accent selected to increase contrast between colours
+# show cluster centres
+for ic in range(4):
+    xc, yc = cen[ic,:]
+
+    plt.plot(xc, yc, "dk", markersize=10)
+
+plt.xlabel("1990")
+plt.ylabel("2019")
+plt.title("CO2 Emission")
+plt.show()
+
+# Plot for five clusters
+kmeans = cluster.KMeans(n_clusters=5)
+kmeans.fit(df_fit)
+# extract labels and cluster centres
+labels = kmeans.labels_
+cen = kmeans.cluster_centers_
+plt.figure(figsize=(6.0, 6.0))
+# Individual colours can be assigned to symbols. The label l is used to the␣
+
+# l-th number from the colour table.
+plt.scatter(df_fit["1990"], df_fit["2019"], c=labels, cmap="Accent")    
+# show cluster centres
+for ic in range(5):
+    xc, yc = cen[ic,:]
+    plt.plot(xc, yc, "dk", markersize=10)
+
+plt.xlabel("1990")
+plt.ylabel("2019")
+plt.title("CO2 Emission 1990 VS 2019")
+plt.title("5 clusters")
+plt.show()
+
+
+df_CO2_t=pd.read_csv("C:\\Users\\DELL\\Downloads\\CO2_t.csv")
+print(df_CO2_t)
+df_C=df_CO2_t.iloc[0:30, [0,3]]
+print(df_C)
+
+a=df_CO2_t['Time']
+b=df_CO2_t['Australia [AUS]']
+print(a)
+print(b)
+x= a.iloc[0:30]
+y = b.iloc[0:30]
+print(x)
+print(y)
+
+plt.figure()
+plt.plot(df_CO2_t['Time'], df_CO2_t['Argentina [ARG]'], label = 'Argentina')
+plt.plot(df_CO2_t['Time'], df_CO2_t['Iran [IRN]'], label = 'Iran')
+plt.plot(df_CO2_t['Time'], df_CO2_t['Belgium [BEL]'], label = 'Belgium')
+plt.plot(df_CO2_t['Time'], df_CO2_t['Italy [ITA]'], label = 'Italy')
+plt.title("CO2 Emission")
+plt.xlabel("Year")
+plt.ylabel("CO2 Emission")
+plt.legend()
+plt.show()
+
+def exp_growth(t, scale, growth):
+    f = scale * np.exp(growth * (t-1990))
+    return f
+def logistics(t, scale, growth, t0):
+    f = scale / (1.0 + np.exp(-growth * (t - t0)))
+    return f
+print(df_C)
+
+popt, covar = opt.curve_fit(exp_growth, df_C["Time"], df_C["Belgium [BEL]"])
+print("Fit parameter", popt)
+# use *popt to pass on the fit parameters
+df_C["pop_exp"] = exp_growth(df_C["Time"], *popt)
+plt.figure()
+plt.plot(df_C["Time"], df_C["Belgium [BEL]"], label="data")
+plt.plot(df_C["Time"], df_C["pop_exp"], label="fit")
+plt.xlim(1990, 2020)
+plt.legend()
+plt.title("First fit attempt")
+plt.xlabel("year")
+plt.ylabel("CO2 Emission")
+plt.show()
+print()
+
+popt = [0.308863, -0.02]
+df_C["pop_exp"] = exp_growth(df_C["Time"], *popt)
+plt.figure()
+plt.plot(df_C["Time"], df_C["Belgium [BEL]"], label="data")
+plt.plot(df_C["Time"], df_C["pop_exp"], label="fit")
+plt.legend()
+plt.xlabel("year")
+plt.ylabel("CO2 Emission")
+plt.title("Improved start value")
+plt.show()
+
+
+# fit exponential growth
+popt, covar = opt.curve_fit(exp_growth, df_C["Time"],
+df_C["Belgium [BEL]"], p0=[0.308863, -0.026])
+# much better
+print("Fit parameter", popt)
+df_C["pop_exp"] = exp_growth(df_C["Time"], *popt)
+plt.figure()
+plt.plot(df_C["Time"], df_C["Belgium [BEL]"], label="data")
+plt.plot(df_C["Time"], df_C["pop_exp"], label="fit")
+plt.legend()
+plt.xlabel("year")
+plt.ylabel("CO2 Emission")
+plt.title("Final fit exponential growth")
+plt.show()
+print()
+
+popt = [0.240253, -0.026, 2004]
+df_C["pop_log"] = logistics(df_C["Time"], *popt)
+plt.figure()
+plt.plot(df_C["Time"], df_C["Belgium [BEL]"], label="data")
+plt.plot(df_C["Time"], df_C["pop_log"], label="fit")
+plt.legend()
+plt.xlabel("year")
+plt.ylabel("CO2 Emission")
+plt.title("Improved start value")
+plt.show()
+
+popt, covar = opt.curve_fit(logistics, df_C["Time"], df_C["Belgium [BEL]"],
+p0=(0.25, -0.01, 2004.0))
+print("Fit parameter", popt)
+df_C["pop_log"] = logistics(df_C["Time"], *popt)
+plt.figure()
+plt.title("logistics function")
+plt.plot(df_C["Time"], df_C["Belgium [BEL]"], label="data")
+plt.plot(df_C["Time"], df_C["pop_log"], label="fit")
+plt.legend()
+plt.xlabel("Year")
+plt.ylabel("CO2 Emission")
+plt.show()
+
+sigma = np.sqrt(np.diag(covar))
+print(sigma)
+#low, up = err.err_ranges(df_C["Time"], logistics, popt, sigma)
+plt.figure()
+plt.title("logistics function")
+plt.plot(df_C["Time"], df_C["Belgium [BEL]"], label="data")
+plt.plot(df_C["Time"], df_C["pop_log"], label="fit")
+#plt.fill_between(df_C["Time"], low, up, alpha=0.7)
+plt.legend()
+plt.xlabel("Year")
+plt.ylabel("CO2 Emission")
+plt.show()
+
+df_population= pd.read_csv("C:\\Users\\DELL\\Downloads\\P GROWTH.csv")
+print(df_population)
+# analysing Australias population growth from 2015 to 2021 using piechart
+Year = ['2015', '2016', '2017', '2018', '2019', '2020', '2021']
+Populationgrowth = np.array([1.078001, 1.057182, 1.037134, 1.015808, 0.993397, 0.970054, 0.947491])
+ 
+plt.figure()
+plt.pie(Populationgrowth, labels=Year)
+plt.title('POPULATION GROWTH (ARGENTINA)', size=8)
+plt.savefig('pgrowth.png')
+plt.show()
