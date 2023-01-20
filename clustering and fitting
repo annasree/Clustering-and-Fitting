@@ -2,18 +2,12 @@
 
 import numpy as np
 import pandas as pd
-import matplotlib   # used to do the formatting
 import matplotlib.pyplot as plt
-import scipy.stats as stats  # good module for statistical operations
 import sklearn.cluster as cluster
 import sklearn.metrics as skmet
-import matplotlib.pyplot as plt
-import pandas as pd
 import scipy.optimize as opt
-import sklearn as sk
-from sklearn import linear_model
-#import errors as err
-#import map
+
+
 
 #  descibing function to Read files using pandas
 def Read_data(file_name, sep='delimiter', header=None):
@@ -224,12 +218,11 @@ plt.show()
 
 df_population= pd.read_csv("C:\\Users\\DELL\\Downloads\\P GROWTH.csv")
 print(df_population)
-# analysing Australias population growth from 2015 to 2021 using piechart
+# analysing Belgium population growth from 2015 to 2021 using piechart
 Year = ['2015', '2016', '2017', '2018', '2019', '2020', '2021']
 Populationgrowth = np.array([1.078001, 1.057182, 1.037134, 1.015808, 0.993397, 0.970054, 0.947491])
  
 plt.figure()
 plt.pie(Populationgrowth, labels=Year)
 plt.title('POPULATION GROWTH (ARGENTINA)', size=8)
-plt.savefig('pgrowth.png')
 plt.show()
