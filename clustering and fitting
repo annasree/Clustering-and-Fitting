@@ -211,10 +211,11 @@ plt.show()
 
 df_population= pd.read_csv("C:\\Users\\DELL\\Downloads\\P GROWTH.csv")
 print(df_population)
-# analysing Belgium population growth from 2015 to 2021 using piechart
+# analysing Argentina population growth from 2015 to 2021 using piechart
 Year = ['2015', '2016', '2017', '2018', '2019', '2020', '2021']
 Populationgrowth = np.array([1.078001, 1.057182, 1.037134, 1.015808, 0.993397, 0.970054, 0.947491])
  
+# ploting the pie chart
 plt.figure()
 plt.pie(Populationgrowth, labels=Year)
 plt.title('POPULATION GROWTH (ARGENTINA)', size=8)
