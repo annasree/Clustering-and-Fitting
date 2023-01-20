@@ -99,7 +99,6 @@ for ic in range(5):
 plt.xlabel("1990")
 plt.ylabel("2019")
 plt.title("CO2 Emission 1990 VS 2019")
-plt.title("5 clusters")
 plt.show()
 
 # reading the file
@@ -167,7 +166,7 @@ plt.plot(df_C["Time"], df_C["pop_exp"], label="fit")
 plt.legend()
 plt.xlabel("year")
 plt.ylabel("CO2 Emission")
-plt.title("Final fit exponential growth")
+plt.title("Exponential Growth")
 plt.show()
 print()
 
@@ -220,3 +219,4 @@ plt.figure()
 plt.pie(Populationgrowth, labels=Year)
 plt.title('POPULATION GROWTH (ARGENTINA)', size=8)
 plt.show()
+
